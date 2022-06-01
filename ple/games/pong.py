@@ -11,12 +11,13 @@ from ple.games.base.pygamewrapper import PyGameWrapper
 
 class Ball(pygame.sprite.Sprite):
 
-    def __init__(self, radius, speed, rng,
+    def __init__(self, radius, speed, rng, colour,
                  pos_init, SCREEN_WIDTH, SCREEN_HEIGHT):
 
         pygame.sprite.Sprite.__init__(self)
 
         self.rng = rng
+        self.colour = colour
         self.radius = radius
         self.speed = speed
         self.pos = vec2d(pos_init)
@@ -32,7 +33,7 @@ class Ball(pygame.sprite.Sprite):
 
         pygame.draw.circle(
             image,
-            (255, 255, 255),
+            self.colour,
             (radius, radius),
             radius,
             0
@@ -97,14 +98,16 @@ class Ball(pygame.sprite.Sprite):
 
 class Player(pygame.sprite.Sprite):
 
-    def __init__(self, speed, rect_width, rect_height,
-                 pos_init, SCREEN_WIDTH, SCREEN_HEIGHT):
+    def __init__(self, speed, rect_width, rect_height, colour,
+                 pos_init, friction,
+                 SCREEN_WIDTH, SCREEN_HEIGHT):
 
         pygame.sprite.Sprite.__init__(self)
 
         self.speed = speed
         self.pos = vec2d(pos_init)
         self.vel = vec2d((0, 0))
+        self.friction = friction
 
         self.rect_height = rect_height
         self.rect_width = rect_width
@@ -117,7 +120,7 @@ class Player(pygame.sprite.Sprite):
 
         pygame.draw.rect(
             image,
-            (255, 255, 255),
+            colour,
             (0, 0, rect_width, rect_height),
             0
         )
@@ -128,7 +131,7 @@ class Player(pygame.sprite.Sprite):
 
     def update(self, dy, dt):
         self.vel.y += dy * dt
-        self.vel.y *= 0.9
+        self.vel.y *= 1-self.friction
 
         self.pos.y += self.vel.y
 
@@ -192,9 +195,20 @@ class Pong(PyGameWrapper):
     ball_speed_ratio: float (default: 0.75)
         Speed of ball (useful for curriculum learning)
 
+    players_side: either "right" or "left"
+        Determines side of the field the agent controls
+
     """
 
-    def __init__(self, width=64, height=48, cpu_speed_ratio=0.6, players_speed_ratio = 0.4, ball_speed_ratio=0.75,  MAX_SCORE=11):
+    def __init__(self, width=64, height=48,
+                 cpu_speed_ratio=1, players_speed_ratio=1,
+                 ball_speed_ratio=1,  MAX_SCORE=11,
+                 ball_radius_ratio=1, ball_colour=(255,255,255),
+                 pad_width=1, pad_height=1, pad_colour=(255,255,255),
+                 pad_friction=1.1,
+                 invert_reward=False,
+                 players_side="right", bg_colour=(0,0,0)
+                 ):
 
         actions = {
             "up": K_w,
@@ -205,16 +219,25 @@ class Pong(PyGameWrapper):
 
         # the %'s come from original values, wanted to keep same ratio when you
         # increase the resolution.
-        self.ball_radius = percent_round_int(height, 0.03)
+        self.ball_radius = percent_round_int(height, 0.03*ball_radius_ratio)
+        self.ball_colour = ball_colour
 
-        self.cpu_speed_ratio = cpu_speed_ratio
-        self.ball_speed_ratio = ball_speed_ratio
-        self.players_speed_ratio = players_speed_ratio
+        self.cpu_speed_ratio = 0.5*cpu_speed_ratio
+        self.players_speed_ratio = 0.5*players_speed_ratio
+        self.ball_speed_ratio = 0.75*ball_speed_ratio
+        self.pad_friction = pad_friction
 
-        self.paddle_width = percent_round_int(width, 0.023)
-        self.paddle_height = percent_round_int(height, 0.15)
+        self.paddle_width = percent_round_int(width, 0.023*pad_width)
+        self.paddle_height = percent_round_int(height, 0.15*pad_height)
+        self.paddle_colour = pad_colour
         self.paddle_dist_to_wall = percent_round_int(width, 0.0625)
+
         self.MAX_SCORE = MAX_SCORE
+        self.rew_multiplier = -1 if invert_reward else 1
+        self.players_side = players_side
+        if self.players_side == left:
+            self.rew_multiplier *= -1
+        self.bg_colour = bg_colour
 
         self.dy = 0.0
         self.score_sum = 0.0  # need to deal with 11 on either side winning
@@ -306,16 +329,27 @@ class Pong(PyGameWrapper):
             self.ball_radius,
             self.ball_speed_ratio * self.height,
             self.rng,
+            self.ball_colour,
             (self.width / 2, self.height / 2),
             self.width,
             self.height
         )
 
+        left_player_pos = (self.width - self.paddle_dist_to_wall, self.height / 2)
+        right_player_pos = (self.paddle_dist_to_wall, self.height / 2)
+        if self.players_side == "right":
+            agent_pos = right_player_pos
+            cpu_pos = left_player_pos
+        else:
+            agent_pos = left_player_pos
+            cpu_pos = right_player_pos
+
         self.agentPlayer = Player(
             self.players_speed_ratio * self.height,
             self.paddle_width,
             self.paddle_height,
-            (self.paddle_dist_to_wall, self.height / 2),
+            self.paddle_colour,
+            agent_pos,
             self.width,
             self.height)
 
@@ -323,7 +357,8 @@ class Pong(PyGameWrapper):
             self.cpu_speed_ratio * self.height,
             self.paddle_width,
             self.paddle_height,
-            (self.width - self.paddle_dist_to_wall, self.height / 2),
+            self.paddle_colour,
+            cpu_pos,
             self.width,
             self.height)
 
@@ -351,7 +386,7 @@ class Pong(PyGameWrapper):
 
     def step(self, dt):
         dt /= 1000.0
-        self.screen.fill((0, 0, 0))
+        self.screen.fill(self.bg_colour)
 
         self.agentPlayer.speed = self.players_speed_ratio * self.height
         self.cpuPlayer.speed = self.cpu_speed_ratio * self.height
@@ -360,7 +395,7 @@ class Pong(PyGameWrapper):
         self._handle_player_events()
 
         # doesnt make sense to have this, but include if needed.
-        self.score_sum += self.rewards["tick"]
+        self.score_sum += self.rewards["tick"] * self.rew_multiplier
 
         self.ball.update(self.agentPlayer, self.cpuPlayer, dt)
 
@@ -368,13 +403,13 @@ class Pong(PyGameWrapper):
 
         # logic
         if self.ball.pos.x <= 0:
-            self.score_sum += self.rewards["negative"]
+            self.score_sum += self.rewards["negative"] * self.rew_multiplier
             self.score_counts["cpu"] += 1.0
             self._reset_ball(-1)
             is_terminal_state = True
 
         if self.ball.pos.x >= self.width:
-            self.score_sum += self.rewards["positive"]
+            self.score_sum += self.rewards["positive"] * self.rew_multiplier
             self.score_counts["agent"] += 1.0
             self._reset_ball(1)
             is_terminal_state = True
@@ -382,11 +417,11 @@ class Pong(PyGameWrapper):
         if is_terminal_state:
             # winning
             if self.score_counts['agent'] == self.MAX_SCORE:
-                self.score_sum += self.rewards["win"]
+                self.score_sum += self.rewards["win"] * self.rew_multiplier
 
             # losing
             if self.score_counts['cpu'] == self.MAX_SCORE:
-                self.score_sum += self.rewards["loss"]
+                self.score_sum += self.rewards["loss"] * self.rew_multiplier
         else:
             self.agentPlayer.update(self.dy, dt)
             self.cpuPlayer.updateCpu(self.ball, dt)
