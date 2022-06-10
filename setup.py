@@ -10,24 +10,24 @@ install_requires = [
     "Pillow"
 ]
 
-# setup(
-# 	name='ple',
-# 	version='0.0.1',
-# 	description='PyGame Learning Environment',
-#     classifiers=[
-#         "Intended Audience :: Developers",
-#         "Intended Audience :: Science/Research",
-#         "License :: OSI Approved :: MIT License",
-#         "Programming Language :: Python :: 2.7",
-#         "Topic :: Scientific/Engineering :: Artificial Intelligence",
-#     ],
-# 	url='https://github.com/ntasfi/PyGame-Learning-Environment',
-# 	author='Norman Tasfi',
-# 	author_email='first letter of first name plus last at googles email service.',
-# 	keywords='',
-# 	license="MIT",
-# 	packages=find_packages(),
-#         include_package_data=False,
-#         zip_safe=False,
-#         install_requires=install_requires
-# )
+setup(
+	name='pMTRLe',
+	version='0.0.1',
+	description='PyGame Reinforcement Learning Environment',
+    classifiers=[
+        "Intended Audience :: Developers",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 2.7",
+        "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    ],
+	url='https://github.com/jupilogy/PyGame-Learning-Environment',
+	author='Jupy, forked from Norman Tasfi',
+	author_email='jupiterian.is@gmail.com',
+	keywords='',
+	license="MIT",
+	packages=find_packages(),
+        include_package_data=False,
+        zip_safe=False,
+        install_requires=install_requires
+)

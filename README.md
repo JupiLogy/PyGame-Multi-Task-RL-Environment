@@ -1,4 +1,13 @@
-# PyGame-Learning-Environment
+# PyGame-(Multi-Task)-Learning-Environment
+
+### Hello from the forker
+Just a brief explanation of this fork. It's designed to make the environments in this original repo a lot more configurable, in order to test agents' multi task abilities in RL environments. I am currently focused on pong.
+
+Here's the rundown of what has changed:
+
+- Many more parameters changeable in Pong, including but not limited to acceleration behaviour of agent, colours of things on screen, side of screen that agent controls
+- Integrated [gym-ple](https://github.com/lusob/gym-ple) directly to the repo (that upstream didn't include pong; and making a pull request would mean it wouldn't work with original PLE, only my fork)
+- Renamed pong to pgpong, so gym would work with the pong game. Basically it won't work if it's also called pong because there's already a gym environment called pong. That's probably why gym-ple didn't implement it.
 
 ![Games](ple_games.jpg?raw=True "Games!")
 
