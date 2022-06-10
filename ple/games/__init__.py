@@ -6,7 +6,7 @@ from ple.games.catcher import Catcher
 from ple.games.flappybird import FlappyBird
 from ple.games.monsterkong import MonsterKong
 from ple.games.pixelcopter import Pixelcopter
-from ple.games.pong import Pong
+from ple.games.pgpong import PgPong
 from ple.games.puckworld import PuckWorld
 from ple.games.raycastmaze import RaycastMaze
 from ple.games.snake import Snake

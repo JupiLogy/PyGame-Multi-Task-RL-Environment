@@ -1,9 +1,9 @@
-Pong
+PgPong
 =====
 
 .. image:: /_static/pong.gif
 
-Pong simulates 2D table tennis. The agent controls an in-game paddle which is used to hit the ball back to the other side. 
+PgPong simulates 2D table tennis. The agent controls an in-game paddle which is used to hit the ball back to the other side. 
 
 The agent controls the left paddle while the CPU controls the right paddle.
 

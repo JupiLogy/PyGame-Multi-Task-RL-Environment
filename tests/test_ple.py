@@ -76,8 +76,8 @@ class MyTestCase(unittest.TestCase):
         self.run_a_game(game)
 
     def test_pong(self):
-        from ple.games.pong import Pong
-        game = Pong()
+        from ple.games.pgpong import PgPong
+        game = PgPong()
         self.run_a_game(game)
 
     def test_doom_not_defined(self):

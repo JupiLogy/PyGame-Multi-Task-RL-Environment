@@ -20,12 +20,12 @@ Available games can be found in the [docs](http://pygame-learning-environment.re
 
 A `PLE` instance requires a game exposing a set of control methods. To see the required methods look at `ple/games/base.py`. 
 
-Here's an example of importing Pong from the games library within PLE:
+Here's an example of importing PgPong from the games library within PLE:
 
 ```python
-from ple.games.pong import Pong
+from ple.games.pgpong import PgPong
 
-game = Pong()
+game = PgPong()
 ```
 
 Next we configure and initialize PLE:

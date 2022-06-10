@@ -3,9 +3,9 @@ Non-Visual State Representation
 
 Sometimes it is useful to have non-visual state representations of games. This could be to try reduced state space, augment visual input, or for troubleshooting purposes. The majority of current games in PLE support non-visual state representations. To use these representations instead of visual inputs one needs to inspect the state structure given in the documentation. You are free to select sub-poritions ofthe state as agent input.
 
-Lets setup an agent to use a non-visual state representation of :class:`Pong <ple.games.pong.Pong>`.
+Lets setup an agent to use a non-visual state representation of :class:`PgPong <ple.games.pgpong.PgPong>`.
 
-First start by examining the values :class:`Pong <ple.games.pong.Pong>` will return from the ``getGameState()`` method:
+First start by examining the values :class:`PgPong <ple.games.pgpong.PgPong>` will return from the ``getGameState()`` method:
 
 .. code-block:: python
         
@@ -24,7 +24,7 @@ First start by examining the values :class:`Pong <ple.games.pong.Pong>` will ret
 
             return state
 
-We see that ``getGameState()`` of Pong returns several values each time it is called. Using the returned dictonary we can create a numpy vector representating our state.
+We see that ``getGameState()`` of PgPong returns several values each time it is called. Using the returned dictonary we can create a numpy vector representating our state.
 
 This can be accomplished in the following ways:
 
@@ -40,14 +40,14 @@ You have control over which values you want to include in the state vector. Trai
 
 .. code-block:: python
 
-        from ple.games.pong import Pong 
+        from ple.games.pgpong import PgPong 
         from ple import PLE
         import numpy as np
 
         def process_state(state):
                 return np.array([ state.values() ])
 
-        game = Pong()
+        game = PgPong()
         p = PLE(game, display_screen=True, state_preprocessor=process_state)
         agent = myAgentHere(input_shape=p.getGameStateDims(), allowed_actions=p.getActionSet())
 

@@ -169,11 +169,13 @@ class Player(pygame.sprite.Sprite):
         self.rect.center = (self.pos.x, self.pos.y)
 
 
-class Pong(PyGameWrapper):
+class PgPong(PyGameWrapper):
     """
     Loosely based on code from marti1125's `pong game`_.
 
     .. _pong game: https://github.com/marti1125/pong/
+
+    Also, renamed PgPong so as to not overlap with OpenAI gym's Pong game.
 
     Parameters
     ----------
@@ -235,7 +237,7 @@ class Pong(PyGameWrapper):
         self.MAX_SCORE = MAX_SCORE
         self.rew_multiplier = -1 if invert_reward else 1
         self.players_side = players_side
-        if self.players_side == left:
+        if self.players_side == "left":
             self.rew_multiplier *= -1
         self.bg_colour = bg_colour
 
@@ -350,6 +352,7 @@ class Pong(PyGameWrapper):
             self.paddle_height,
             self.paddle_colour,
             agent_pos,
+            self.pad_friction,
             self.width,
             self.height)
 
@@ -359,6 +362,7 @@ class Pong(PyGameWrapper):
             self.paddle_height,
             self.paddle_colour,
             cpu_pos,
+            self.pad_friction,
             self.width,
             self.height)
 
@@ -433,7 +437,7 @@ if __name__ == "__main__":
     import numpy as np
 
     pygame.init()
-    game = Pong(width=256, height=200)
+    game = PgPong(width=256, height=200)
     game.screen = pygame.display.set_mode(game.getScreenDims(), 0, 32)
     game.clock = pygame.time.Clock()
     game.rng = np.random.RandomState(24)

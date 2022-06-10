@@ -7,7 +7,7 @@ Available Games
   /user/games/monsterkong
   /user/games/flappybird
   /user/games/pixelcopter
-  /user/games/pong
+  /user/games/pgpong
   /user/games/puckworld
   /user/games/raycastmaze
   /user/games/snake
